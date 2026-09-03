@@ -1,6 +1,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { SystemUtil } from '../common/utils/SystemUtil';
 
 const DOMAIN = 0x0000;
 
@@ -28,7 +29,22 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      this.initWindow(windowStage)
     });
+  }
+
+  /**
+   * 加载窗口后，初始化
+   */
+  initWindow(windowStage: window.WindowStage) {
+    //获取状态栏高度
+    SystemUtil.getStatusBarHeight(getContext(this)).then((data) => {
+      let height: number = Math.round(data) //取整数
+      // StoreUtil.put(AppConstants.db_StatusBarHeight, height)
+    })
+
+    //设置沉浸式效果
+    SystemUtil.setWindowFullScreen(windowStage, true)
   }
 
   onWindowStageDestroy(): void {
