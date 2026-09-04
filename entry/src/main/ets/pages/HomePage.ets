@@ -1,3 +1,5 @@
+import { LengthMetrics } from "@kit.ArkUI";
+
 /**
  * 家居
  */
@@ -6,6 +8,7 @@ export struct HomePage {
   @Consume('pageNav') navPathStack: NavPathStack;
   @State familyName: string = '--的家'
   @State currentIndex: number = 0;
+  @State familyList: Array<string> = ['H', 'Z', '小H']
   @State roomList: Array<string> = ['客厅', '主卧', '次卧', '厨房']
   @State deviceList: Array<string> = ['主灯', '扫地机器人', '摄像头', '电视']
 
@@ -42,13 +45,69 @@ export struct HomePage {
   @Builder
   TopFunBuilder() {
     Row() {
-      Text(this.familyName).fontSize(22).fontWeight(FontWeight.Medium).fontColor(Color.Black)
+      Text(this.familyName)
+        .fontSize(22)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(Color.Black)
+        .bindMenu(this.FamilyMenuBuilder())
 
-      Text('+').fontSize(35).fontColor(Color.Black)
+      Text('+').fontSize(35).fontColor(Color.Black).bindMenu(this.AddMenuBuilder())
     }
     .justifyContent(FlexAlign.SpaceBetween)
     .padding({ top: 60, left: 20, right: 20 })
     .width('100%')
+  }
+
+  @Builder
+  FamilyMenuBuilder() {
+    Menu() {
+      ForEach(this.familyList, (value: string, index: number) => {
+        MenuItem({ content: value + '的家' })
+          .onClick(() => {
+            this.familyName = value + '的家'
+          })
+      });
+    }
+
+    Column() {
+    }.height(1).background('#E5E5E5').margin({ left: 10, right: 10 })
+
+    Row() {
+      SymbolGlyph($r('sys.symbol.gearshape_fill'))
+
+      Text('家庭设置').fontSize(16).margin({ left: 10 })
+    }
+    .margin({ left: 10, right: 10 })
+    .height(50)
+  }
+
+  @Builder
+  AddMenuBuilder() {
+    Menu() {
+      MenuItem({ content: "添加设备" })
+        .onClick(() => {
+
+        })
+      MenuItem({ content: "创建智能" })
+        .onClick(() => {
+
+        })
+      MenuItem({ content: "扫一扫" })
+        .onClick(() => {
+
+        })
+      MenuItem({ content: "管理房间" })
+        .onClick(() => {
+
+        })
+    }
+    .menuItemDivider({
+      strokeWidth: LengthMetrics.vp(1),
+      color: '#E5E5E5',
+      startMargin: LengthMetrics.vp(10),
+      endMargin: LengthMetrics.vp(10),
+      mode: DividerMode.EMBEDDED_IN_MENU
+    })
   }
 
   @Builder
