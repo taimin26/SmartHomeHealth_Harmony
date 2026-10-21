@@ -7,6 +7,18 @@
     {
       "name": "transparent",
       "value": "#00000000"
+    },
+    {
+      "name": "main_blue",
+      "value": "#FF4683F5"
+    },
+    {
+      "name": "bg",
+      "value": "#FFF3F3F3"
+    },
+    {
+      "name": "gray_400",
+      "value": "#FFBDBDBD"
     }
   ]
 }
