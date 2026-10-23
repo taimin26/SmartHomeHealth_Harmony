@@ -68,7 +68,7 @@ export struct SportPage {
               type: ProgressType.Linear
             })
               .color(Color.Blue)
-              .backgroundColor($r('app.color.gray_400'))
+              .backgroundColor($r('app.color.gray_e5'))
               .style({
                 strokeWidth: 10,
                 strokeRadius: 5,
@@ -88,9 +88,7 @@ export struct SportPage {
               ForEach(this.sportList, (value: SportBean, index: number) => {
                 ListItem() {
                   SportCardItem({ item: value })
-                }.onClick(() => {
-
-                })
+                }
               });
             }
             .listDirection(Axis.Vertical)
@@ -142,6 +140,7 @@ export struct SportPage {
 
 @Component
 struct SportCardItem {
+  @Consume('pageNav') navPathStack: NavPathStack;
   @ObjectLink item: SportBean;
 
   build() {
@@ -197,6 +196,7 @@ struct SportCardItem {
       .width('100%')
     }
     .onClick(() => {
+      this.navPathStack.pushPathByName('VideoPage', this.item.url)
     })
     .backgroundColor(Color.White)
     .borderRadius(16)
