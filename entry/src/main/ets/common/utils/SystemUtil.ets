@@ -1,7 +1,8 @@
 import { window } from '@kit.ArkUI';
 import { Logger } from './Logger';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { common } from '@kit.AbilityKit';
+import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
+import { scanBarcode, scanCore } from '@kit.ScanKit';
 
 export class SystemUtil {
   /**
@@ -46,5 +47,54 @@ export class SystemUtil {
     } catch (error) {
       Logger.error(`设置沉浸式、全屏失败: ${error.code}, message: ${error.message}`);
     }
+  }
+
+  /**
+   * 申请权限
+   */
+  static async requestPermissions(context: Context, permissions: Array<Permissions>): Promise<boolean> {
+    let atManager = abilityAccessCtrl.createAtManager();
+    //判断权限的授权状态来决定是否唤起弹窗
+    return atManager.requestPermissionsFromUser(context, permissions).then((data) => {
+      let isAll = true;
+      let grantStatus: Array<number> = data.authResults;
+      let length: number = grantStatus.length;
+      for (let i = 0; i < length; i++) {
+        if (grantStatus[i] === 0) {
+          isAll = true;
+        } else {
+          isAll = false;
+        }
+      }
+      return isAll;
+    }).catch((err: BusinessError) => {
+      Logger.error('requestPermissions',
+        `requestPermissionsFromUser failed, code is ${err.code}, message is ${err.message}`);
+      return false;
+    });
+  }
+
+  /**
+   * 扫码
+   */
+  static openScan(context: common.Context): Promise<string> {
+    let options: scanBarcode.ScanOptions = {
+      scanTypes: [scanCore.ScanType.ALL],
+      enableMultiMode: true,
+      enableAlbum: true
+    };
+
+    if (!canIUse("SystemCapability.Multimedia.Scan.ScanBarcode")) {
+      return Promise.resolve('');
+    }
+
+    return scanBarcode.startScanForResult(context, options).then((result: scanBarcode.ScanResult) => {
+      Logger.info('openScan', `Scan result is ${JSON.stringify(result)}`);
+      let value: string = result.originalValue
+      return value
+    }).catch((error: BusinessError) => {
+      Logger.error('openScan', `Failed ScanResult. Code:${error.code}, message: ${error.message}`);
+      return ''
+    });
   }
 }

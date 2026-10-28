@@ -1,4 +1,8 @@
 import { LengthMetrics } from "@kit.ArkUI";
+import { Logger } from "../common/utils/Logger";
+import { SystemUtil } from "../common/utils/SystemUtil";
+import { Permissions } from "@kit.AbilityKit";
+import { UserDB, User } from "../common/data/UserDB";
 
 /**
  * 家居
@@ -86,15 +90,22 @@ export struct HomePage {
     Menu() {
       MenuItem({ content: "添加设备" })
         .onClick(() => {
-
         })
       MenuItem({ content: "创建智能" })
         .onClick(() => {
-
         })
       MenuItem({ content: "扫一扫" })
         .onClick(() => {
-
+          const permissions: Array<Permissions> = [
+            'ohos.permission.CAMERA'];
+          SystemUtil.requestPermissions(getContext(this), permissions).then((is) => {
+            if (!is) {
+              return
+            }
+            SystemUtil.openScan(getContext(this)).then((value: string) => {
+              Logger.debug(value)
+            })
+          })
         })
       MenuItem({ content: "管理房间" })
         .onClick(() => {

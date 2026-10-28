@@ -2,6 +2,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { SystemUtil } from '../common/utils/SystemUtil';
+import { StoreRUtil } from '../common/utils/StoreRUtil';
 
 const DOMAIN = 0x0000;
 
@@ -26,6 +27,7 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
     EntryAbility.windowStage = windowStage
+    this.init()
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
@@ -35,6 +37,10 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
       this.initWindow(windowStage)
     });
+  }
+
+  init() {
+    StoreRUtil.getIns().init(this.context)
   }
 
   /**
