@@ -1,9 +1,10 @@
-import { StoreRUtil } from "../utils/StoreRUtil";
+import { StoreRUtil } from "./StoreRUtil";
 import { relationalStore } from "@kit.ArkData";
 import { Logger } from "../utils/Logger";
+import { MyUtil } from "../utils/MyUtil";
 
 export class Family {
-  familyId: string;
+  familyId: string
   familyName: string
 
   constructor(familyId: string, familyName: string) {
@@ -13,17 +14,23 @@ export class Family {
 }
 
 export class FamilyDB {
-  static insert(family: Family) {
-    const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(family));
-    StoreRUtil.getIns().insert(StoreRUtil.table_family, value)
+  static async insertTest() {
+    let data: Family[] = getFamilyList()
+    for (let i = 0; i < data.length; i++) {
+      await FamilyDB.insert(data[i])
+    }
   }
 
-  static queryAll() {
+  static async insert(family: Family) {
+    const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(family));
+    await StoreRUtil.getIns().insert(StoreRUtil.table_family, value)
+  }
+
+  static async queryAll(): Promise<Family[]> {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_family);
-    StoreRUtil.getIns().query(predicates).then((data) => {
-      Logger.info('StoreRUtil', 'queryAll--' + JSON.stringify(data))
-      let dataArray: Family[] = JSON.parse(JSON.stringify(data))
-    })
+    const data = await StoreRUtil.getIns().query(predicates)
+    let dataArray: Family[] = JSON.parse(JSON.stringify(data))
+    return dataArray
   }
 
   static update(family: Family) {
@@ -38,4 +45,12 @@ export class FamilyDB {
     predicates.equalTo('familyId', familyId);
     StoreRUtil.getIns().delete(predicates)
   }
+}
+
+export function getFamilyList(): Family[] {
+  return [
+    new Family(MyUtil.getRandomNumber16(), "H"),
+    new Family(MyUtil.getRandomNumber16(), "Z"),
+    new Family(MyUtil.getRandomNumber16(), "小H"),
+  ];
 }

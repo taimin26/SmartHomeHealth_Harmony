@@ -1,4 +1,4 @@
-import { StoreRUtil } from "../utils/StoreRUtil";
+import { StoreRUtil } from "./StoreRUtil";
 import { relationalStore } from "@kit.ArkData";
 import { Logger } from "../utils/Logger";
 
@@ -15,23 +15,35 @@ export class User {
 }
 
 export class UserDB {
-  static insert(user: User) {
+  static async insert(user: User) {
     const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(user));
-    StoreRUtil.getIns().insert(StoreRUtil.table_user, value)
+    await StoreRUtil.getIns().insert(StoreRUtil.table_user, value)
   }
 
-  static queryAll() {
+  static async queryAll(): Promise<User[]> {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_user);
-    StoreRUtil.getIns().query(predicates).then((data) => {
+    /*StoreRUtil.getIns().query(predicates).then((data) => {
       Logger.info('StoreRUtil', 'queryAll--' + JSON.stringify(data))
       let dataArray: User[] = JSON.parse(JSON.stringify(data))
-    })
+    })*/
+    const data = await StoreRUtil.getIns().query(predicates)
+    let dataArray: User[] = JSON.parse(JSON.stringify(data))
+    return dataArray
   }
 
   static update(user: User) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_user);
     predicates.equalTo('userId', user.userId);
     const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(user));
+    StoreRUtil.getIns().update(predicates, value)
+  }
+
+  static updateName(userId: string, name: string) {
+    let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_user);
+    predicates.equalTo('userId', userId);
+    const value: relationalStore.ValuesBucket = {
+      name: name
+    };
     StoreRUtil.getIns().update(predicates, value)
   }
 

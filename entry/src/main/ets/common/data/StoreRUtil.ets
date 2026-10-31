@@ -1,5 +1,4 @@
-import { Logger } from './Logger';
-import common from '@ohos.app.ability.common';
+import { Logger } from '../utils/Logger';
 import { relationalStore } from '@kit.ArkData';
 
 /**
@@ -14,6 +13,9 @@ export class StoreRUtil {
   private dbName: string = 'app_db'
   public static table_user: string = 'users'
   public static table_family: string = 'family'
+  public static table_rooms: string = 'rooms'
+  public static table_devices: string = 'devices'
+  public static table_smart: string = 'smart'
 
   private constructor() {
   }
@@ -43,8 +45,22 @@ export class StoreRUtil {
         ' (ID INTEGER PRIMARY KEY AUTOINCREMENT, userId TEXT NOT NULL, name TEXT NOT NULL, age INTEGER)';
 
     const SQL_family =
-      'CREATE TABLE IF NOT EXISTS ' + StoreRUtil.table_user +
+      'CREATE TABLE IF NOT EXISTS ' + StoreRUtil.table_family +
         ' (ID INTEGER PRIMARY KEY AUTOINCREMENT, familyId TEXT NOT NULL, familyName TEXT NOT NULL)';
+
+    const SQL_rooms =
+      'CREATE TABLE IF NOT EXISTS ' + StoreRUtil.table_rooms +
+        ' (ID INTEGER PRIMARY KEY AUTOINCREMENT, roomId TEXT NOT NULL, roomName TEXT NOT NULL)';
+
+    const SQL_devices =
+      'CREATE TABLE IF NOT EXISTS ' + StoreRUtil.table_devices +
+        ' (ID INTEGER PRIMARY KEY AUTOINCREMENT, deviceId TEXT NOT NULL, belongRoomId TEXT NOT NULL' +
+        ', deviceName TEXT, productId TEXT, hardwareId TEXT, icon TEXT, status TEXT, isSwitchOn INTEGER NOT NULL DEFAULT 0)';
+
+    const SQL_smart =
+      'CREATE TABLE IF NOT EXISTS ' + StoreRUtil.table_smart +
+        ' (ID INTEGER PRIMARY KEY AUTOINCREMENT, smartId TEXT NOT NULL, name TEXT NOT NULL, icon TEXT, isSwitchOn INTEGER NOT NULL DEFAULT 0, conditions TEXT, actions TEXT)';
+
 
     relationalStore.getRdbStore(context, STORE_CONFIG, (err, store) => {
       if (err) {
@@ -59,6 +75,9 @@ export class StoreRUtil {
       if (store.version === 0) {
         store.executeSql(SQL_user);
         store.executeSql(SQL_family);
+        store.executeSql(SQL_rooms);
+        store.executeSql(SQL_devices);
+        store.executeSql(SQL_smart);
         store.version = 1;
       }
 
@@ -68,16 +87,18 @@ export class StoreRUtil {
   /**
    * 插入数据
    */
-  insert(tableName: string, value: relationalStore.ValuesBucket) {
-    if (this.store) {
-      this.store.insert(tableName, value, (err: BusinessError, rowId: number) => {
-        if (err) {
-          Logger.error(TAG, `Failed to insert data. Code:${err.code}, message:${err.message}`);
-          return
-        }
-        Logger.info(TAG, `Succeeded in inserting data. rowId:${rowId}`);
-      })
+  async insert(tableName: string, value: relationalStore.ValuesBucket): Promise<number> {
+    if (!this.store) {
+      return 0
     }
+    let number = 0;
+    try {
+      number = await this.store.insert(tableName, value)
+      Logger.info(TAG, `Succeeded insert. ${number}`);
+    } catch (err) {
+      Logger.error(TAG, `Failed to insert data. Code:${err.code}, message:${err.message}`);
+    }
+    return number
   }
 
   /**

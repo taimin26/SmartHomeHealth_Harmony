@@ -2,7 +2,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { SystemUtil } from '../common/utils/SystemUtil';
-import { StoreRUtil } from '../common/utils/StoreRUtil';
+import { StoreRUtil } from '../common/data/StoreRUtil';
 
 const DOMAIN = 0x0000;
 

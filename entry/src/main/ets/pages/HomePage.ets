@@ -2,7 +2,10 @@ import { LengthMetrics } from "@kit.ArkUI";
 import { Logger } from "../common/utils/Logger";
 import { SystemUtil } from "../common/utils/SystemUtil";
 import { Permissions } from "@kit.AbilityKit";
-import { UserDB, User } from "../common/data/UserDB";
+import { SmartDB, Smart } from "../common/data/SmartDB";
+import { StoreRUtil } from "../common/data/StoreRUtil";
+import { Family, FamilyDB, getFamilyList } from "../common/data/FamilyDB";
+import { Device, getDeviceList, Room, RoomDeviceDao, RoomDevices } from "../common/data/RoomDeviceDB";
 
 /**
  * 家居
@@ -12,9 +15,30 @@ export struct HomePage {
   @Consume('pageNav') navPathStack: NavPathStack;
   @State familyName: string = '--的家'
   @State currentIndex: number = 0;
-  @State familyList: Array<string> = ['H', 'Z', '小H']
-  @State roomList: Array<string> = ['客厅', '主卧', '次卧', '厨房']
-  @State deviceList: Array<string> = ['主灯', '扫地机器人', '摄像头', '电视']
+  @State familyList: Family[] = []
+  @State roomDevicesList: RoomDevices[] = []
+  @State roomList: Room[] = []
+
+  aboutToAppear(): void {
+    FamilyDB.queryAll().then((data) => {
+      this.familyList = data
+      if (this.familyList.length == 0) {
+        FamilyDB.insertTest()
+        this.familyList = getFamilyList()
+      }
+      this.familyName = this.familyList[0].familyName + '的家'
+    })
+    RoomDeviceDao.getAllRoomsWithDevices().then((data) => {
+      this.roomDevicesList = data
+      if (this.roomDevicesList.length == 0) {
+        RoomDeviceDao.insertTest()
+        this.roomDevicesList = getDeviceList()
+      }
+      for (let i = 0; i < this.roomDevicesList.length; i++) {
+        this.roomList[i] = this.roomDevicesList[i].room
+      }
+    })
+  }
 
   build() {
     NavDestination() {
@@ -22,11 +46,11 @@ export struct HomePage {
         this.TopFunBuilder()
 
         Tabs() {
-          ForEach(this.roomList, (value: string, index: number) => {
+          ForEach(this.roomList, (value: Room, index: number) => {
             TabContent() {
-              this.DevicePageBuilder()
+              this.DevicePageBuilder(this.roomDevicesList[index].devices)
             }
-            .tabBar(this.TabItemBuilder(value, index))
+            .tabBar(this.TabItemBuilder(value.roomName, index))
           });
         }
         .barMode(BarMode.Scrollable)
@@ -65,10 +89,10 @@ export struct HomePage {
   @Builder
   FamilyMenuBuilder() {
     Menu() {
-      ForEach(this.familyList, (value: string, index: number) => {
-        MenuItem({ content: value + '的家' })
+      ForEach(this.familyList, (value: Family, index: number) => {
+        MenuItem({ content: value.familyName + '的家' })
           .onClick(() => {
-            this.familyName = value + '的家'
+            this.familyName = value.familyName + '的家'
           })
       });
     }
@@ -135,10 +159,10 @@ export struct HomePage {
   }
 
   @Builder
-  DevicePageBuilder() {
+  DevicePageBuilder(deviceList: Device[]) {
     Column() {
       Grid() {
-        ForEach(this.deviceList, (value: string, index: number) => {
+        ForEach(deviceList, (value: Device, index: number) => {
           GridItem() {
             this.DeviceBuilder(value)
           }
@@ -153,11 +177,15 @@ export struct HomePage {
   }
 
   @Builder
-  DeviceBuilder(name: string) {
+  DeviceBuilder(value: Device) {
     Column() {
-      Text(name).fontSize(16).fontWeight(FontWeight.Medium).fontColor(Color.Black)
+      Text(value.deviceName).fontSize(16).fontWeight(FontWeight.Medium).fontColor(Color.Black)
 
-      Text('在线').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#80000000').margin({ top: 4 })
+      Text(value.status === '1' ? '在线' : '离线')
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .fontColor('#80000000')
+        .margin({ top: 4 })
 
       Image($r('app.media.foreground')).margin({ top: 20 }).width(30).height(30)
     }
