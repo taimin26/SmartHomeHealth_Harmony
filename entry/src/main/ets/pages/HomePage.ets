@@ -6,6 +6,7 @@ import { SmartDB, Smart } from "../common/data/SmartDB";
 import { StoreRUtil } from "../common/data/StoreRUtil";
 import { Family, FamilyDB, getFamilyList } from "../common/data/FamilyDB";
 import { Device, getDeviceList, Room, RoomDeviceDao, RoomDevices } from "../common/data/RoomDeviceDB";
+import { JSON } from "@kit.ArkTS";
 
 /**
  * 家居
@@ -20,23 +21,44 @@ export struct HomePage {
   @State roomList: Room[] = []
 
   aboutToAppear(): void {
-    FamilyDB.queryAll().then((data) => {
-      this.familyList = data
-      if (this.familyList.length == 0) {
-        FamilyDB.insertTest()
-        this.familyList = getFamilyList()
-      }
-      this.familyName = this.familyList[0].familyName + '的家'
+    setTimeout(() => {
+      FamilyDB.queryAll().then((data) => {
+        this.familyList = data
+        if (this.familyList.length == 0) {
+          this.familyList = getFamilyList()
+          setTimeout(() => {
+            FamilyDB.insertTest()
+          }, 500)
+        }
+        this.familyName = this.familyList[0].familyName + '的家'
+      })
+
+      RoomDeviceDao.getAllRoomsWithDevices().then((data) => {
+        this.roomDevicesList = data
+        if (this.roomDevicesList.length == 0) {
+          RoomDeviceDao.insertTest()
+          this.roomDevicesList = getDeviceList()
+        }
+        for (let i = 0; i < this.roomDevicesList.length; i++) {
+          this.roomList[i] = this.roomDevicesList[i].room
+        }
+      })
+    }, 200)
+
+    getContext(this).eventHub.on("refreshFamily", () => {
+      FamilyDB.queryAll().then((data) => {
+        this.familyList = data
+      })
     })
-    RoomDeviceDao.getAllRoomsWithDevices().then((data) => {
-      this.roomDevicesList = data
-      if (this.roomDevicesList.length == 0) {
-        RoomDeviceDao.insertTest()
-        this.roomDevicesList = getDeviceList()
-      }
-      for (let i = 0; i < this.roomDevicesList.length; i++) {
-        this.roomList[i] = this.roomDevicesList[i].room
-      }
+
+    getContext(this).eventHub.on("refreshRoom", () => {
+      RoomDeviceDao.getAllRoomsWithDevices().then((data) => {
+        this.roomDevicesList = data
+        this.roomList.length = 0
+        for (let i = 0; i < this.roomDevicesList.length; i++) {
+          this.roomList[i] = this.roomDevicesList[i].room
+        }
+      })
     })
   }
 
@@ -105,6 +127,9 @@ export struct HomePage {
 
       Text('家庭设置').fontSize(16).margin({ left: 10 })
     }
+    .onClick(() => {
+      this.navPathStack.pushPathByName('FamilyManagerPage', '')
+    })
     .margin({ left: 10, right: 10 })
     .height(50)
   }
@@ -133,7 +158,7 @@ export struct HomePage {
         })
       MenuItem({ content: "管理房间" })
         .onClick(() => {
-
+          this.navPathStack.pushPathByName('RoomManagerPage', '')
         })
     }
     .menuItemDivider({
@@ -189,6 +214,9 @@ export struct HomePage {
 
       Image($r('app.media.foreground')).margin({ top: 20 }).width(30).height(30)
     }
+    .onClick(() => {
+      this.navPathStack.pushPathByName('DeviceEditPage', JSON.stringify(value))
+    })
     .padding(20)
     .backgroundColor('#E0FFF0E6')
     .borderRadius(15)

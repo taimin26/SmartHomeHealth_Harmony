@@ -50,6 +50,7 @@ export class RoomDeviceDao {
   static async insertTest() {
     let dataRoom: RoomDevices[] = getDeviceList()
     for (let i = 0; i < dataRoom.length; i++) {
+      RoomDeviceDao.insertRoom(dataRoom[i].room)
       let data: Device[] = dataRoom[i].devices
       for (let j = 0; j < data.length; j++) {
         await RoomDeviceDao.insertDevice(data[j])
@@ -76,7 +77,7 @@ export class RoomDeviceDao {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_rooms);
     predicates.equalTo('roomId', roomId);
     const data = await StoreRUtil.getIns().query(predicates)
-    let dataArray: Room = JSON.parse(JSON.stringify(data))
+    let dataArray: Room = JSON.parse(JSON.stringify(data[0]))
     return dataArray
   }
 
@@ -94,7 +95,7 @@ export class RoomDeviceDao {
 
   static async insertRoom(room: Room) {
     const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(room));
-    await StoreRUtil.getIns().insert(StoreRUtil.table_rooms, value)
+    return await StoreRUtil.getIns().insert(StoreRUtil.table_rooms, value)
   }
 
   static async insertDevice(device: Device) {
@@ -112,10 +113,10 @@ export class RoomDeviceDao {
     StoreRUtil.getIns().delete(predicates)
   }
 
-  static deleteRoom(roomId: string) {
+  static async deleteRoom(roomId: string) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_rooms);
     predicates.equalTo('roomId', roomId);
-    StoreRUtil.getIns().delete(predicates)
+    return await StoreRUtil.getIns().delete(predicates)
   }
 
   static deleteDevices(deviceId: string) {

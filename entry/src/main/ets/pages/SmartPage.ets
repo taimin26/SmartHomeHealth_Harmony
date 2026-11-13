@@ -12,8 +12,10 @@ export struct SmartPage {
     SmartDB.queryAll().then((data) => {
       this.smartList = data
       if (this.smartList.length == 0) {
-        SmartDB.insertTest()
         this.smartList = getSmartList()
+        setTimeout(() => {
+          SmartDB.insertTest()
+        }, 500)
       }
     })
   }

@@ -7,6 +7,31 @@
       "data": {
         "description": "this is Page"
       }
+    },
+    {
+      "name": "FamilyManagerPage",
+      "pageSourceFile": "src/main/ets/pages/home/FamilyManagerPage.ets",
+      "buildFunction": "FamilyManagerPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
+    },
+    {
+      "name": "RoomManagerPage",
+      "pageSourceFile": "src/main/ets/pages/home/RoomManagerPage.ets",
+      "buildFunction": "RoomManagerPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
+    }
+  ,
+    {
+      "name": "DeviceEditPage",
+      "pageSourceFile": "src/main/ets/pages/home/DeviceEditPage.ets",
+      "buildFunction": "DeviceEditPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
     }
   ]
 }

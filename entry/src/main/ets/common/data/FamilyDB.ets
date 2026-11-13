@@ -23,7 +23,7 @@ export class FamilyDB {
 
   static async insert(family: Family) {
     const value: relationalStore.ValuesBucket = JSON.parse(JSON.stringify(family));
-    await StoreRUtil.getIns().insert(StoreRUtil.table_family, value)
+    return await StoreRUtil.getIns().insert(StoreRUtil.table_family, value)
   }
 
   static async queryAll(): Promise<Family[]> {
@@ -40,10 +40,10 @@ export class FamilyDB {
     StoreRUtil.getIns().update(predicates, value)
   }
 
-  static delete(familyId: string) {
+  static async delete(familyId: string) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_family);
     predicates.equalTo('familyId', familyId);
-    StoreRUtil.getIns().delete(predicates)
+    return await StoreRUtil.getIns().delete(predicates)
   }
 }
 

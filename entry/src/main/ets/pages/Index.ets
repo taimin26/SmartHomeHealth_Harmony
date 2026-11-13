@@ -46,7 +46,6 @@ struct Index {
     .title(this.navTitle)
     .hideTitleBar(this.isHideNav)
     .toolbarConfiguration(this.getToolBar())
-    .padding({ bottom: 30 })
     .background('#F1F3F5')
   }
 

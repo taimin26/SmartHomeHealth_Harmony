@@ -143,16 +143,18 @@ export class StoreRUtil {
   /**
    * 删除数据
    */
-  delete(predicates: relationalStore.RdbPredicates) {
-    if (this.store) {
-      this.store.delete(predicates, (err: BusinessError, rows: number) => {
-        if (err) {
-          Logger.error(TAG, `Failed to delete data. Code:${err.code}, message:${err.message}`);
-          return
-        }
-        Logger.info(TAG, `Succeeded in delete data. row count: ${rows}`);
-      })
+  async delete(predicates: relationalStore.RdbPredicates): Promise<number> {
+    if (!this.store) {
+      return 0
     }
+    let number = 0;
+    try {
+      number = await this.store.delete(predicates)
+      Logger.info(TAG, `Succeeded delete.`);
+    } catch (err) {
+      Logger.error(TAG, `Failed to delete data. Code:${err.code}, message:${err.message}`);
+    }
+    return number
   }
 
   /**
