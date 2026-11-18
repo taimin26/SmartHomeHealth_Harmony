@@ -60,6 +60,15 @@ export struct HomePage {
         }
       })
     })
+
+    getContext(this).eventHub.on("refreshDevice", () => {
+      RoomDeviceDao.getAllRoomsWithDevices().then((data) => {
+        this.roomDevicesList.length = 0
+        setTimeout(() => {
+          this.roomDevicesList = data
+        }, 50)
+      })
+    })
   }
 
   build() {
@@ -67,27 +76,29 @@ export struct HomePage {
       Column() {
         this.TopFunBuilder()
 
-        Tabs() {
-          ForEach(this.roomList, (value: Room, index: number) => {
-            TabContent() {
-              this.DevicePageBuilder(this.roomDevicesList[index].devices)
-            }
-            .tabBar(this.TabItemBuilder(value.roomName, index))
-          });
+        if (this.roomDevicesList.length > 0) {
+          Tabs({ index: this.currentIndex }) {
+            ForEach(this.roomList, (value: Room, index: number) => {
+              TabContent() {
+                this.DevicePageBuilder(this.roomDevicesList[index].devices)
+              }
+              .tabBar(this.TabItemBuilder(value.roomName, index))
+            });
+          }
+          .barMode(BarMode.Scrollable)
+          .fadingEdge(false)
+          .onChange((index: number) => {
+            this.currentIndex = index
+          })
+          .margin({ top: 20 })
         }
-        .barMode(BarMode.Scrollable)
-        .fadingEdge(false)
-        .onChange((index: number) => {
-          this.currentIndex = index
-        })
-        .margin({ top: 20 })
 
       }
       .width('100%')
       .height('100%')
     }
     .backgroundColor($r('app.color.transparent'))
-    .padding({ bottom: 100 })
+    .padding({ bottom: $r('app.float.page_app_bottom') })
     .width('100%')
     .height('100%')
   }

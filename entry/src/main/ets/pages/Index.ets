@@ -26,17 +26,21 @@ struct Index {
           .height('100%')
           .width('100%')
 
-        if (this.pagePotion == 0) {
-          HomePage()
-        } else if (this.pagePotion == 1) {
-          SmartPage()
-        } else if (this.pagePotion == 2) {
-          HealthPage()
-        } else if (this.pagePotion == 3) {
-          SportPage()
-        } else if (this.pagePotion == 4) {
-          MinePage()
+        Column() {
+          if (this.pagePotion == 0) {
+            HomePage()
+          } else if (this.pagePotion == 1) {
+            SmartPage()
+          } else if (this.pagePotion == 2) {
+            HealthPage()
+          } else if (this.pagePotion == 3) {
+            SportPage()
+          } else if (this.pagePotion == 4) {
+            MinePage()
+          }
         }
+        .height('100%')
+        .width('100%')
       }
       .height('100%')
       .width('100%')
@@ -46,6 +50,7 @@ struct Index {
     .title(this.navTitle)
     .hideTitleBar(this.isHideNav)
     .toolbarConfiguration(this.getToolBar())
+    .enableToolBarAdaptation(true)
     .background('#F1F3F5')
   }
 

@@ -41,7 +41,7 @@ export struct SmartPage {
       .height('100%')
     }
     .backgroundColor($r('app.color.transparent'))
-    .padding({ bottom: 100 })
+    .padding({ bottom: $r('app.float.page_app_bottom') })
     .width('100%')
     .height('100%')
   }

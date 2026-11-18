@@ -19,17 +19,15 @@ struct RoomManagerPage {
   private dialog: CustomDialog = new CustomDialog(this.getUIContext());
   private dialog_input: InputDialog = new InputDialog(this.getUIContext());
   private isRefreshRoom: boolean = false
+  private roomId: string = ''
   private isSelect: boolean = false
+  private selectedValue: number = 0
 
   aboutToAppear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, false)
-
     this.loadRoomList()
   }
 
   aboutToDisappear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, true)
-
     if (this.isRefreshRoom) {
       getContext(this).eventHub.emit("refreshRoom")
     }
@@ -38,12 +36,17 @@ struct RoomManagerPage {
   loadRoomList() {
     RoomDeviceDao.getAllRooms().then((data) => {
       this.roomList = data
+      for (let i = 0; i < this.roomList.length; i++) {
+        if (this.roomList[i].roomId === this.roomId) {
+          this.selectedValue = i
+        }
+      }
     })
   }
 
   build() {
     NavDestination() {
-      // if (!this.isSelect) {
+      if (!this.isSelect) {
         RelativeContainer() {
           List({ space: 12 }) {
             ForEach(this.roomList, (room: Room, index: number) => {
@@ -111,21 +114,26 @@ struct RoomManagerPage {
         }
         .height('100%')
         .width('100%')
-/*      } else {
+      } else {
         RelativeContainer() {
-          List({ space: 12 }) {
+          Column({ space: 10 }) {
             ForEach(this.roomList, (room: Room, index: number) => {
-              ListItem() {
-                RoomSelectItem({
-                  item: room, onDelete: () => {
-
-                  }
-                })
+              Row({ space: 8 }) {
+                Radio({ value: room.roomId, group: "group1" })
+                  .checked(this.selectedValue === index)
+                  .onChange((isOn: boolean) => {
+                    if (isOn) {
+                      this.selectedValue = index
+                    }
+                  })
+                Text(room.roomName)
               }
-            });
+              .borderRadius(24)
+              .backgroundColor(Color.White)
+              .padding(20)
+              .width('100%')
+            })
           }
-          .listDirection(Axis.Vertical)
-          .scrollBar(BarState.Off)
           .margin({
             top: 20,
             bottom: 20
@@ -150,17 +158,19 @@ struct RoomManagerPage {
               bottom: { anchor: '__container__', align: VerticalAlign.Bottom }
             })
             .onClick(() => {
-
+              this.navPathStack.pop(this.roomList[this.selectedValue])
             })
         }
         .height('100%')
         .width('100%')
-      }*/
+      }
     }
     .onReady((ctx: NavDestinationContext) => {
-      this.isSelect = (ctx.pathInfo.param as string) == '1' ? true : false
+      this.isSelect = (ctx.pathInfo.param as string) == '' ? false : true
+      this.roomId = ctx.pathInfo.param as string
     })
     .title(this.isSelect ? '选择房间' : '房间管理')
+    .padding({ top: $r('app.float.page_title_top') })
     .backgroundColor($r('app.color.bg'))
     .height('100%')
     .width('100%')
@@ -197,35 +207,3 @@ struct RoomItem {
     .width('100%')
   }
 }
-
-/*
-@Component
-struct RoomSelectItem {
-  @Consume('pageNav') navPathStack: NavPathStack;
-  @Prop item: Room
-  onDelete: () => void = () => {
-  }
-
-  build() {
-    Row() {
-      SymbolGlyph($r('sys.symbol.trash_fill')).width(20).height(20)
-        .onClick(() => {
-          this.onDelete()
-        })
-
-      Text(this.item.roomName)
-        .fontSize(16)
-        .fontColor(Color.Black)
-        .fontWeight(FontWeight.Medium)
-        .margin({ left: 20, right: 20 })
-
-      Blank()
-
-      SymbolGlyph($r('sys.symbol.list_bullet')).width(20).height(20)
-    }
-    .borderRadius(24)
-    .backgroundColor(Color.White)
-    .padding(20)
-    .width('100%')
-  }
-}*/

@@ -3,6 +3,14 @@
     {
       "name": "page_text_font_size",
       "value": "50fp"
+    },
+    {
+      "name": "page_app_bottom",
+      "value": "100"
+    },
+    {
+      "name": "page_title_top",
+      "value": "50"
     }
   ]
 }

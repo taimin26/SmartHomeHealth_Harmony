@@ -20,14 +20,10 @@ struct FamilyManagerPage {
   private isRefreshFamily: boolean = false
 
   aboutToAppear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, false)
-
     this.loadFamilyList()
   }
 
   aboutToDisappear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, true)
-
     if (this.isRefreshFamily) {
       getContext(this).eventHub.emit("refreshFamily")
     }
@@ -109,6 +105,7 @@ struct FamilyManagerPage {
       .width('100%')
     }
     .title('家庭管理')
+    .padding({ top: $r('app.float.page_title_top') })
     .backgroundColor($r('app.color.bg'))
     .height('100%')
     .width('100%')

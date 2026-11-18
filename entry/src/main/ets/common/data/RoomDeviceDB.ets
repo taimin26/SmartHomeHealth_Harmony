@@ -119,7 +119,7 @@ export class RoomDeviceDao {
     return await StoreRUtil.getIns().delete(predicates)
   }
 
-  static deleteDevices(deviceId: string) {
+  static deleteDevice(deviceId: string) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_devices);
     predicates.equalTo('deviceId', deviceId);
     StoreRUtil.getIns().delete(predicates)

@@ -3,6 +3,7 @@ import { InputDialog } from '../../common/view/dialog/InputDialog';
 import { CustomDialog } from '../../common/view/dialog/CustomDialog';
 import EntryAbility from '../../entryability/EntryAbility';
 import { Device, Room, RoomDeviceDao } from '../../common/data/RoomDeviceDB';
+import { SymbolGlyphModifier } from '@kit.ArkUI';
 
 @Builder
 export function DeviceEditPageBuilder(): void {
@@ -18,18 +19,15 @@ struct DeviceEditPage {
   private isRefreshDevice: boolean = false
   private device: Device | undefined = undefined
   private room: Room | undefined = undefined
-  @State deviceName: string = ''
   @State roomName: string = ''
+  @State deviceName: string = ''
   @State deviceId: string = ''
   @State hardwareId: string = ''
 
   aboutToAppear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, false)
   }
 
   aboutToDisappear(): void {
-    SystemUtil.setWindowFullScreen(EntryAbility.windowStage, true)
-
     if (this.isRefreshDevice) {
       getContext(this).eventHub.emit("refreshDevice")
     }
@@ -70,6 +68,17 @@ struct DeviceEditPage {
             SymbolGlyph($r('sys.symbol.chevron_right')).width(20).height(20)
           }
         }
+        .onClick(() => {
+          if (this.room) {
+            this.navPathStack.pushPathByName('RoomManagerPage', this.room.roomId, (popInfo) => {
+              this.room = popInfo.result as Room
+              this.roomName = this.room.roomName
+              if (this.device) {
+                this.device.belongRoomId = this.room.roomId
+              }
+            })
+          }
+        })
         .borderRadius(16)
         .backgroundColor(Color.White)
         .padding({ left: 10, right: 10 })
@@ -117,7 +126,11 @@ struct DeviceEditPage {
             this.dialog.getParams().title = '是否删除设备？'
             this.dialog.getParams().setOnCallback((data) => {
               if (data == 1) {
-
+                if (this.device) {
+                  RoomDeviceDao.deleteDevice(this.device.deviceId)
+                  this.isRefreshDevice = true
+                  this.navPathStack.pop()
+                }
               }
             })
             this.dialog.openDialog()
@@ -137,6 +150,20 @@ struct DeviceEditPage {
       }
     })
     .title('设备编辑')
+    .menus([
+      {
+        value: 'confirm',
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.checkmark')),
+        action: () => {
+          if (this.device) {
+            RoomDeviceDao.updateDevice(this.device)
+            this.isRefreshDevice = true
+            this.navPathStack.pop()
+          }
+        }
+      }
+    ])
+    .padding({ top: $r('app.float.page_title_top') })
     .backgroundColor($r('app.color.bg'))
     .height('100%')
     .width('100%')
