@@ -23,12 +23,27 @@
       "data": {
         "description": "this is Page"
       }
-    }
-  ,
+    },
     {
       "name": "DeviceEditPage",
       "pageSourceFile": "src/main/ets/pages/home/DeviceEditPage.ets",
       "buildFunction": "DeviceEditPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
+    },
+    {
+      "name": "AddSmartPage",
+      "pageSourceFile": "src/main/ets/pages/smart/AddSmartPage.ets",
+      "buildFunction": "AddSmartPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
+    },
+    {
+      "name": "AddConditionActionPage",
+      "pageSourceFile": "src/main/ets/pages/smart/AddConditionActionPage.ets",
+      "buildFunction": "AddConditionActionPageBuilder",
       "data": {
         "description": "this is Page"
       }

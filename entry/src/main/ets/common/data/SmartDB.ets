@@ -166,6 +166,27 @@ export class SmartDB {
     Logger.info('StoreRUtil', 'queryAll--' + JSON.stringify(dataArray))
     return dataArray
   }
+
+  static async getSmart(smartId: string): Promise<Smart> {
+    let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_smart);
+    predicates.equalTo('smartId', smartId);
+    const data = await StoreRUtil.getIns().query(predicates)
+    let dataArray: Smart = bucketToSmart(data[0])
+    return dataArray
+  }
+
+  static update(smart: Smart) {
+    let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_smart);
+    predicates.equalTo('smartId', smart.smartId);
+    const value: relationalStore.ValuesBucket = smartToBucket(smart)
+    StoreRUtil.getIns().update(predicates, value)
+  }
+
+  static delete(smartId: string) {
+    let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_smart);
+    predicates.equalTo('smartId', smartId);
+    StoreRUtil.getIns().delete(predicates)
+  }
 }
 
 export function getSmartList(): Smart[] {

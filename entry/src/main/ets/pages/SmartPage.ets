@@ -55,7 +55,7 @@ export struct SmartPage {
         .fontColor(Color.Black)
 
       Text('+').fontSize(35).fontColor(Color.Black).onClick(() => {
-
+        this.navPathStack.pushPathByName('AddSmartPage', '')
       })
     }
     .justifyContent(FlexAlign.SpaceBetween)
@@ -85,6 +85,9 @@ export struct SmartPage {
       .alignItems(VerticalAlign.Center)
       .width('100%')
     }
+    .onClick(() => {
+      this.navPathStack.pushPathByName('AddSmartPage', value.smartId)
+    })
     .padding(20)
     .backgroundColor('#E0FFF0E6')
     .borderRadius(15)
