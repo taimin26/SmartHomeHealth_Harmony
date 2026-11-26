@@ -53,6 +53,7 @@ class DialogParams {
   onDialogCallback: (data: string) => void = () => {
   };
   text: string = "";
+  inputType: InputType = InputType.Normal;
 
   constructor(onDialogCallback?: (data: string) => void) {
     if (onDialogCallback) {
@@ -96,7 +97,7 @@ struct DialogView {
         .fontWeight(FontWeight.Bold)
 
       TextInput({ placeholder: '请输入' })
-        .type(InputType.Normal)
+        .type(this.params.inputType)
         .onChange((value: string) => {
           this.value = value
         })

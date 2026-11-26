@@ -18,6 +18,12 @@ export struct SmartPage {
         }, 500)
       }
     })
+
+    getContext(this).eventHub.on("refreshSmart", () => {
+      SmartDB.queryAll().then((data) => {
+        this.smartList = [...data]
+      })
+    })
   }
 
   build() {

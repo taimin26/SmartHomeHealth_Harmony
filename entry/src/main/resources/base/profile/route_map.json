@@ -47,6 +47,14 @@
       "data": {
         "description": "this is Page"
       }
+    },
+    {
+      "name": "SelectDevicePage",
+      "pageSourceFile": "src/main/ets/pages/smart/SelectDevicePage.ets",
+      "buildFunction": "SelectDevicePageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { LengthMetrics } from '@kit.ArkUI';
 import { getSportList, SportBean } from '../common/bean/SportBean';
+import { InputDialog } from '../common/view/dialog/InputDialog';
 
 /**
  * 运动
@@ -14,7 +15,6 @@ export struct SportPage {
   ]
   @State stepTarget: number = 10000
   @State stepValue: number = 8000
-  @State stepProgress: number = 0.8
   @State private sportList: SportBean[] = getSportList()
   @State likeNum: number = 1000
   @State saveNum: number = 19
@@ -63,7 +63,7 @@ export struct SportPage {
             .width('100%')
 
             Progress({
-              value: this.stepProgress,
+              value: this.stepValue / this.stepTarget,
               total: 1,
               type: ProgressType.Linear
             })
@@ -132,7 +132,13 @@ export struct SportPage {
     Menu() {
       MenuItem({ content: "设置目标步数" })
         .onClick(() => {
-
+          let dialog_input: InputDialog = new InputDialog(this.getUIContext());
+          dialog_input.getParams().text = '目标步数'
+          dialog_input.getParams().inputType = InputType.Number
+          dialog_input.getParams().setOnCallback((data) => {
+            this.stepTarget = parseInt(data)
+          })
+          dialog_input.openDialog()
         })
     }
   }

@@ -3,6 +3,7 @@ import { SymbolGlyphModifier } from '@kit.ArkUI';
 import { CustomDialog } from '../../common/view/dialog/CustomDialog';
 import { TimeDateDialog } from '../../common/view/dialog/TimeDateDialog';
 import { Logger } from '../../common/utils/Logger';
+import { Device } from '../../common/data/RoomDeviceDB';
 
 @Builder
 export function AddConditionActionPageBuilder(): void {
@@ -29,15 +30,20 @@ struct AddConditionActionPage {
           .height(60)
           .width('100%')
           .onClick(() => {
-            /*if (this.isAction) {
-              let data: Action =
-                new Action(1, new SmartDevice(device.deviceId, device.deviceName, device.productId, ""), null)
-              this.navPathStack.pop(data)
-            } else {
-              let data: Condition =
-                new Condition(1, new SmartDevice(device.deviceId, device.deviceName, device.productId, ""), null, null)
-              this.navPathStack.pop(data)
-            }*/
+            this.navPathStack.pushPathByName('SelectDevicePage', '1', (popInfo) => {
+              let device: Device = popInfo.result as Device
+
+              if (this.isAction) {
+                let data: Action =
+                  new Action(1, new SmartDevice(device.deviceId, device.deviceName, device.productId, ""), null)
+                this.navPathStack.pop(data)
+              } else {
+                let data: Condition =
+                  new Condition(1, new SmartDevice(device.deviceId, device.deviceName, device.productId, ""), null,
+                    null)
+                this.navPathStack.pop(data)
+              }
+            })
           })
 
         if (!this.isAction) {

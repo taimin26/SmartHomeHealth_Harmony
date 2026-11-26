@@ -1,6 +1,7 @@
 import { Action, Condition, Smart, SmartDB } from '../../common/data/SmartDB';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import { CustomDialog } from '../../common/view/dialog/CustomDialog';
+import { MyUtil } from '../../common/utils/MyUtil';
 
 @Builder
 export function AddSmartPageBuilder(): void {
@@ -15,10 +16,8 @@ struct AddSmartPage {
   private isEdit: boolean = false
   private smartId: string = ''
   private isRefresh: boolean = false
-  @State smart: Smart | undefined = undefined
-
-  aboutToAppear(): void {
-  }
+  @State smart: Smart = new Smart('', '', '', false, [], [])
+  @State changeNum: number = 0
 
   aboutToDisappear(): void {
     if (this.isRefresh) {
@@ -57,7 +56,7 @@ struct AddSmartPage {
 
         Column().height(30).width('100%')
 
-        if (this.smart !== undefined && (this.smart?.conditions.length > 0 || this.smart?.actions.length > 0)) {
+        if (this.smart.conditions.length > 0 || this.smart.actions.length > 0) {
           Row() {
             Text('触发条件').fontSize(16).fontColor($r('app.color.main_blue'))
 
@@ -70,7 +69,7 @@ struct AddSmartPage {
           .padding({ left: 5, right: 5 })
           .width('100%')
 
-          List({ space: 10 }) {
+          List({ space: 5 }) {
             ForEach(this.smart.conditions, (item: Condition, index: number) => {
               ListItem() {
                 Row() {
@@ -90,7 +89,9 @@ struct AddSmartPage {
           .width('100%')
         }
 
-        if (this.smart == undefined || this.smart?.conditions.length == 0) {
+        if (this.smart.conditions.length == 0) {
+          Column().height(10).width('100%')
+
           Text('+添加条件')
             .fontColor($r('app.color.main_blue'))
             .backgroundColor(Color.White)
@@ -105,7 +106,7 @@ struct AddSmartPage {
 
         Column().height(30).width('100%')
 
-        if (this.smart !== undefined && (this.smart?.conditions.length > 0 || this.smart?.actions.length > 0)) {
+        if (this.smart.conditions.length > 0 || this.smart.actions.length > 0) {
           Row() {
             Text('执行动作').fontSize(16).fontColor($r('app.color.main_blue'))
 
@@ -118,7 +119,7 @@ struct AddSmartPage {
           .padding({ left: 5, right: 5 })
           .width('100%')
 
-          List({ space: 10 }) {
+          List({ space: 5 }) {
             ForEach(this.smart.actions, (item: Action, index: number) => {
               ListItem() {
                 Row() {
@@ -138,7 +139,9 @@ struct AddSmartPage {
           .width('100%')
         }
 
-        if (this.smart == undefined || this.smart?.actions.length == 0) {
+        if (this.smart.actions.length == 0) {
+          Column().height(10).width('100%')
+
           Text('+添加动作')
             .fontColor($r('app.color.main_blue'))
             .backgroundColor(Color.White)
@@ -151,7 +154,7 @@ struct AddSmartPage {
             })
         }
 
-        if (this.smart !== undefined && this.smart.smartId !== '') {
+        if (this.isEdit) {
           Blank()
 
           Button('删除智能')
@@ -165,11 +168,10 @@ struct AddSmartPage {
               this.dialog.getParams().title = '是否删除智能？'
               this.dialog.getParams().setOnCallback((data) => {
                 if (data == 1) {
-                  if (this.smart) {
-                    SmartDB.delete(this.smart.smartId)
+                  SmartDB.delete(this.smart.smartId).then(() => {
                     this.isRefresh = true
                     this.navPathStack.pop()
-                  }
+                  })
                 }
               })
               this.dialog.openDialog()
@@ -181,7 +183,7 @@ struct AddSmartPage {
         left: 30,
         right: 30,
         top: 20,
-        bottom: 30
+        bottom: 50
       })
       .height('100%')
       .width('100%')
@@ -197,10 +199,22 @@ struct AddSmartPage {
         value: 'confirm',
         symbolIcon: new SymbolGlyphModifier($r('sys.symbol.checkmark')),
         action: () => {
-          if (this.smart) {
-            SmartDB.update(this.smart)
-            this.isRefresh = true
-            this.navPathStack.pop()
+          if (this.smart.name === '' || this.smart.conditions.length == 0 || this.smart.actions.length == 0) {
+            return
+          }
+          if (this.isEdit) {
+            SmartDB.update(this.smart).then(() => {
+              this.isRefresh = true
+              this.navPathStack.pop()
+            })
+          } else {
+            if (this.smart.smartId === '') {
+              this.smart.smartId = MyUtil.getRandomNumber16()
+            }
+            SmartDB.insert(this.smart).then(() => {
+              this.isRefresh = true
+              this.navPathStack.pop()
+            })
           }
         }
       }
@@ -234,14 +248,14 @@ struct AddSmartPage {
   goCondition() {
     this.navPathStack.pushPathByName('AddConditionActionPage', '0', (popInfo) => {
       let condition: Condition = popInfo.result as Condition
-      this.smart?.conditions.push(condition)
+      this.smart.conditions = [...this.smart.conditions, condition]
     })
   }
 
   goAction() {
     this.navPathStack.pushPathByName('AddConditionActionPage', '1', (popInfo) => {
       let action: Action = popInfo.result as Action
-      this.smart?.actions.push(action)
+      this.smart.actions = [...this.smart.actions, action]
     })
   }
 }

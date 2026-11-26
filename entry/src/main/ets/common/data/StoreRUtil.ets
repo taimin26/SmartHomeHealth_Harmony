@@ -128,16 +128,18 @@ export class StoreRUtil {
   /**
    * 修改数据
    */
-  update(predicates: relationalStore.RdbPredicates, value: relationalStore.ValuesBucket) {
-    if (this.store) {
-      this.store.update(value, predicates, (err: BusinessError, rows: number) => {
-        if (err) {
-          Logger.error(TAG, `Failed to update data. Code:${err.code}, message:${err.message}`);
-          return
-        }
-        Logger.info(TAG, `Succeeded in updating data. row count: ${rows}`);
-      })
+  async update(predicates: relationalStore.RdbPredicates, value: relationalStore.ValuesBucket) {
+    if (!this.store) {
+      return 0
     }
+    let number = 0;
+    try {
+      number = await this.store.update(value, predicates)
+      Logger.info(TAG, `Succeeded update.`);
+    } catch (err) {
+      Logger.error(TAG, `Failed to update data. Code:${err.code}, message:${err.message}`);
+    }
+    return number
   }
 
   /**

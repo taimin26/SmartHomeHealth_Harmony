@@ -10,10 +10,10 @@ import { MyUtil } from "../utils/MyUtil";
 export class Smart {
   smartId: string
   name: string
-  icon: string
-  isSwitchOn: boolean
-  conditions: Condition[]
-  actions: Action[]
+  icon: string = ''
+  isSwitchOn: boolean = false
+  conditions: Condition[] = []
+  actions: Action[] = []
 
   constructor(
     smartId: string,
@@ -175,17 +175,17 @@ export class SmartDB {
     return dataArray
   }
 
-  static update(smart: Smart) {
+  static async update(smart: Smart) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_smart);
     predicates.equalTo('smartId', smart.smartId);
     const value: relationalStore.ValuesBucket = smartToBucket(smart)
-    StoreRUtil.getIns().update(predicates, value)
+    return await StoreRUtil.getIns().update(predicates, value)
   }
 
-  static delete(smartId: string) {
+  static async delete(smartId: string) {
     let predicates = new relationalStore.RdbPredicates(StoreRUtil.table_smart);
     predicates.equalTo('smartId', smartId);
-    StoreRUtil.getIns().delete(predicates)
+    return await StoreRUtil.getIns().delete(predicates)
   }
 }
 
