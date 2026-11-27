@@ -55,6 +55,22 @@
       "data": {
         "description": "this is Page"
       }
+    },
+    {
+      "name": "AddDevicePage",
+      "pageSourceFile": "src/main/ets/pages/home/AddDevicePage.ets",
+      "buildFunction": "AddDevicePageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
+    },
+    {
+      "name": "AddDeviceConfirmPage",
+      "pageSourceFile": "src/main/ets/pages/home/AddDeviceConfirmPage.ets",
+      "buildFunction": "AddDeviceConfirmPageBuilder",
+      "data": {
+        "description": "this is Page"
+      }
     }
   ]
 }

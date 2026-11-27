@@ -145,7 +145,7 @@ export struct HealthPage {
     Menu() {
       MenuItem({ content: "添加设备" })
         .onClick(() => {
-
+          this.navPathStack.pushPathByName('AddDevicePage','')
         })
     }
   }

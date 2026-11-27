@@ -150,9 +150,11 @@ export struct HomePage {
     Menu() {
       MenuItem({ content: "添加设备" })
         .onClick(() => {
+          this.navPathStack.pushPathByName('AddDevicePage','')
         })
       MenuItem({ content: "创建智能" })
         .onClick(() => {
+          this.navPathStack.pushPathByName('AddSmartPage', '')
         })
       MenuItem({ content: "扫一扫" })
         .onClick(() => {
